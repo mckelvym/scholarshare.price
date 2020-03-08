@@ -2,9 +2,17 @@ package scholarshare.price;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-
+import com.google.common.io.Files;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.List;
-
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -31,8 +39,18 @@ public class Application
 	 *
 	 * @since Nov 23, 2017
 	 */
-	private static final org.apache.log4j.Logger log = org.apache.log4j.Logger
+	private static final Logger	log	= LoggerFactory
 			.getLogger(Application.class);
+
+	/**
+	 * @since Mar 8, 2020
+	 */
+	private static String		s_MergeFile;
+
+	/**
+	 * @since Mar 8, 2020
+	 */
+	private static String		s_OutFile;
 
 	/**
 	 * Suppress normal logging from httpclient and http headers traffic.
@@ -69,6 +87,18 @@ public class Application
 	 */
 	public static void main(final String[] args)
 	{
+		System.setProperty("spring.main.allow-bean-definition-overriding",
+				"true");
+
+		for (final String arg : args)
+		{
+			System.out.println("Arg: " + arg);
+		}
+
+		s_MergeFile = args[0];
+		s_OutFile = args[1];
+		log.info("Mergefile: " + s_MergeFile);
+		log.info("Outfile: " + s_OutFile);
 		SpringApplication.run(Application.class, args);
 	}
 
@@ -109,11 +139,75 @@ public class Application
 			response.getObservations().forEach(o ->
 			{
 				final List<String> elements = Lists.newArrayList();
-				elements.add(String.valueOf(o.getDate()));
-				Fund.getOrdered().stream().map(o.getValue()::get)
-						.map(String::valueOf).forEach(elements::add);
+				final String date = String.valueOf(o.getDate());
+				elements.add(date);
+				final List<Fund> ordered = Lists
+						.newArrayList(Fund.getOrdered());
+				Collections.reverse(ordered);
+				ordered.stream().map(o.getValue()::get)
+						.map(v -> String.format("%.2f", v))
+						.forEach(elements::add);
 
+				System.out.println(
+						"Date," + ordered.stream().map(Fund::getDescription)
+								.collect(Collectors.joining(",")));
 				System.out.println(Joiner.on(",").join(elements));
+
+				if (s_OutFile != null)
+				{
+					log.info("Write to " + s_OutFile);
+					try (BufferedWriter writer = Files.newWriter(
+							new File(s_OutFile), Charset.defaultCharset()))
+					{
+						writer.write("Date,"
+								+ ordered.stream().map(Fund::getDescription)
+										.collect(Collectors.joining(",")));
+						writer.newLine();
+						writer.write(Joiner.on(",").join(elements));
+						writer.newLine();
+
+						if (s_MergeFile != null)
+						{
+							log.info("Read from: " + s_MergeFile);
+							Files.readLines(new File(s_MergeFile),
+									Charset.defaultCharset()).stream().skip(1)
+									.forEach(line ->
+									{
+										try
+										{
+											writer.write(line);
+											writer.newLine();
+										}
+										catch (final FileNotFoundException e)
+										{
+											final String message = String
+													.format("Unable to locate file: "
+															+ s_MergeFile);
+											log.error(message, e);
+										}
+										catch (final IOException e)
+										{
+											final String message = String
+													.format("Unable to read: "
+															+ s_MergeFile);
+											log.error(message, e);
+										}
+									});
+						}
+					}
+					catch (final FileNotFoundException e)
+					{
+						final String message = String
+								.format("Unable to locate file: " + s_OutFile);
+						log.error(message, e);
+					}
+					catch (final IOException e)
+					{
+						final String message = String
+								.format("Unable to write to: " + s_OutFile);
+						log.error(message, e);
+					}
+				}
 			});
 
 			context.close();
