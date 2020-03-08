@@ -1,9 +1,8 @@
 package scholarshare.price;
 
 import com.google.common.base.CharMatcher;
-
 import java.time.LocalDate;
-
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -58,34 +57,21 @@ public class ScholarshareEntry
 	private Number		value;
 
 	/**
-	 * @return a string formatted like an enum constant
-	 * @since Nov 24, 2017
-	 */
-	public String getFormattedAsEnum()
-	{
-		return CharMatcher.javaLetterOrDigit().or(CharMatcher.is('_'))
-				.retainFrom(CharMatcher.whitespace().or(CharMatcher.is('-'))
-						.replaceFrom(getNameAndGroup(), "_"))
-				.toUpperCase();
-	}
-
-	/**
-	 * @return the {@link Fund} by calling {@link #getFormattedAsEnum()} and
-	 *         valueOf
+	 * @return the {@link Fund} if it could be matched, otherwise
+	 *         {@link Fund#NOOP}
 	 * @since Nov 24, 2017
 	 */
 	public Fund getFund()
 	{
-		return Fund.valueOf(getFormattedAsEnum());
-	}
+		String entryName = CharMatcher.whitespace()
+				.replaceFrom(String.format("%s", getName()), ' ');
 
-	/**
-	 * @return the combined name and group
-	 * @since Nov 24, 2017
-	 */
-	public String getNameAndGroup()
-	{
-		return CharMatcher.whitespace().replaceFrom(
-				String.format("%s (%s)", getName(), getGroup()), ' ');
+		entryName = CharMatcher.javaLetterOrDigit().or(CharMatcher.is('_'))
+				.retainFrom(CharMatcher.whitespace().or(CharMatcher.is('-'))
+						.replaceFrom(entryName, "_"))
+				.toUpperCase();
+
+		final Optional<Fund> tryValueOf = Fund.tryValueOf(entryName);
+		return tryValueOf.orElse(Fund.NOOP);
 	}
 }

@@ -5,7 +5,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.Lists;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -16,10 +15,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.util.DefaultUriTemplateHandler;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 /**
  * Makes requests and parses them.
@@ -31,6 +31,12 @@ import org.springframework.web.util.DefaultUriTemplateHandler;
 @Service
 public class ServiceClient
 {
+	/**
+	 * @since Mar 8, 2020
+	 */
+	private static final Logger log = LoggerFactory
+			.getLogger(ServiceClient.class);
+
 	/**
 	 * Read the daily prices page and return a listing of entries.
 	 *
@@ -52,7 +58,7 @@ public class ServiceClient
 			client.getOptions().setCssEnabled(false);
 			client.getOptions().setJavaScriptEnabled(false);
 
-			final URI uri = new DefaultUriTemplateHandler().expand(
+			final URI uri = new DefaultUriBuilderFactory().expand(
 					p_Request.toUriTemplate(), p_Request.toUriVariables());
 			final HtmlPage page = client.getPage(uri.toString());
 			page.cleanUp();
@@ -61,11 +67,10 @@ public class ServiceClient
 					.or(CharMatcher.is('.'));
 			LocalDate date = null;
 
-			@SuppressWarnings("unchecked")
-			final List<HtmlElement> div = (List<HtmlElement>) page
+			final List<Object> div = page
 					.getByXPath("//div[@class='panel-group nomobile']");
 
-			final List<HtmlElement> tables = div.get(0)
+			final List<HtmlElement> tables = ((HtmlElement) div.get(0))
 					.getElementsByTagName("table");
 			for (final HtmlElement table : tables)
 			{
@@ -107,6 +112,9 @@ public class ServiceClient
 					final Number changePc = Double
 							.parseDouble(changePcS_Cleaned);
 
+					log.info(String.format(
+							"Build entry from name=%s group=%s value=%s change=%s changePercent=%s date=%s",
+							nameS, groupS, value, change, changePc, date));
 					final ScholarshareEntry entry = ScholarshareEntry.builder()
 							.name(nameS).group(groupS).value(value)
 							.change(change).changePercent(changePc).date(date)
@@ -145,6 +153,7 @@ public class ServiceClient
 			{
 				final LocalDate date = entries.get(0).getDate();
 				final Map<Fund, Number> values = entries.stream()
+						.filter(e -> e.getFund() != Fund.NOOP)
 						.collect(Collectors.toMap(ScholarshareEntry::getFund,
 								ScholarshareEntry::getValue));
 				final Observation observation = Observation.builder().date(date)
