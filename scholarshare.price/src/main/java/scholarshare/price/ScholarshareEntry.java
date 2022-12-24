@@ -39,10 +39,10 @@ public class ScholarshareEntry
 	private LocalDate	date;
 
 	/**
-	 * @since Nov 24, 2017
+	 * @since Dec 24, 2022
 	 */
 	@NonNull
-	private String		group;
+	private Fund		fund;
 
 	/**
 	 * @since Nov 24, 2017
@@ -61,7 +61,7 @@ public class ScholarshareEntry
 	 *         {@link Fund#NOOP}
 	 * @since Nov 24, 2017
 	 */
-	public Fund getFund()
+	public Fund getFundFromName()
 	{
 		String entryName = CharMatcher.whitespace()
 				.replaceFrom(String.format("%s", getName()), ' ');

@@ -168,7 +168,7 @@ public enum Fund
 	{
 		getOrdered().forEach(fund ->
 		{
-			map.put(fund.toString(), fund);
+			map.put(fund.getDescription().toLowerCase(), fund);
 		});
 	}
 
@@ -198,7 +198,8 @@ public enum Fund
 	 */
 	public static Optional<Fund> tryValueOf(final String p_String)
 	{
-		final Fund fund = map.get(p_String);
+		String string = p_String.toLowerCase();
+		final Fund fund = map.get(string);
 		if (fund != null)
 		{
 			return Optional.of(fund);
@@ -206,9 +207,19 @@ public enum Fund
 
 		for (final Entry<String, Fund> entry : map.entrySet())
 		{
-			if (p_String.contains(entry.getKey()))
+			String key = entry.getKey();
+			Fund value = entry.getValue();
+			if (string.contains(key))
 			{
-				return Optional.of(entry.getValue());
+//				System.out.println(
+//						value + ": " + string + " contains " + key + " (1)");
+				return Optional.of(value);
+			}
+			if (key.contains(string))
+			{
+//				System.out.println(
+//						value + ": " + key + " contains " + string + " (2)");
+				return Optional.of(value);
 			}
 		}
 
