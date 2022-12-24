@@ -1,5 +1,12 @@
 # Change Log
 
+## v1.1.0 (2022-12-24)
+
+- Update Spring Boot version to 2.2.0
+- Update for new Scholarshare format, including fund renames and page restructuring
+	- Adjusted pattern matching
+	- New service URL: [https://www.scholarshare529.com/investment/price-performance](https://www.scholarshare529.com/investment/price-performance)
+
 ## v1.0.1 (2020-03-08)
 
 - Update Spring Boot version to 2.2.0
