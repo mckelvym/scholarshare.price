@@ -1,16 +1,15 @@
 package scholarshare.price;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.Scope;
+
+import com.google.common.base.Joiner;
+import com.google.common.io.Files;
 
 /**
  * Downloads share price information from TSP site.
@@ -138,11 +140,10 @@ public class Application
 
 			response.getObservations().forEach(o ->
 			{
-				final List<String> elements = Lists.newArrayList();
+				final List<String> elements = new ArrayList<>();
 				final String date = String.valueOf(o.getDate());
 				elements.add(date);
-				final List<Fund> ordered = Lists
-						.newArrayList(Fund.getOrdered());
+				final List<Fund> ordered = new ArrayList<>(Fund.getOrdered());
 				Collections.reverse(ordered);
 				ordered.stream().map(o.getValue()::get)
 						.map(v -> String.format("%.2f", v))

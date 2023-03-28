@@ -6,6 +6,7 @@ import java.net.URI;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,6 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.google.common.base.CharMatcher;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -61,7 +61,7 @@ public class ServiceClient
 			final Request p_Request)
 			throws IOException, MalformedURLException, ParseException
 	{
-		final List<ScholarshareEntry> entries = Lists.newArrayList();
+		final List<ScholarshareEntry> entries = new ArrayList<>();
 		try (WebClient client = new WebClient())
 		{
 			log.info("Client create");
@@ -79,7 +79,7 @@ public class ServiceClient
 			final List<Object> matches = page.getByXPath(xPathExpr);
 			log.info("Found " + matches.size() + " matches.");
 
-			List<HtmlElement> tables = Lists.newArrayList();
+			List<HtmlElement> tables = new ArrayList<>();
 
 			for (Object match : matches)
 			{
@@ -103,7 +103,7 @@ public class ServiceClient
 	private static List<ScholarshareEntry> processTables(
 			List<HtmlElement> tables)
 	{
-		List<ScholarshareEntry> entries = Lists.newArrayList();
+		List<ScholarshareEntry> entries = new ArrayList<>();
 		AtomicReference<LocalDate> dateRef = new AtomicReference<>();
 		for (final HtmlElement table : tables)
 		{
@@ -122,7 +122,7 @@ public class ServiceClient
 	private static List<ScholarshareEntry> processTable(final HtmlElement table,
 			AtomicReference<LocalDate> dateRef)
 	{
-		List<ScholarshareEntry> entries = Lists.newArrayList();
+		List<ScholarshareEntry> entries = new ArrayList<>();
 
 		final CharMatcher numberMatcher = CharMatcher.digit()
 				.or(CharMatcher.is('.'));
@@ -149,19 +149,15 @@ public class ServiceClient
 			}
 		}
 
-		List<HtmlElement> rows = Lists
-				.newArrayList(table.getElementsByTagName("tr"));
+		List<HtmlElement> rows = new ArrayList<>(table.getElementsByTagName("tr"));
 		for (HtmlElement row : rows)
 		{
-			List<HtmlElement> headings = Lists
-					.newArrayList(row.getElementsByTagName("th"));
-			List<HtmlElement> dataElements = Lists
-					.newArrayList(row.getElementsByTagName("td"));
+			List<HtmlElement> headings = new ArrayList<>(row.getElementsByTagName("th"));
+			List<HtmlElement> dataElements = new ArrayList<>(row.getElementsByTagName("td"));
 
 			for (HtmlElement heading : headings)
 			{
-				List<HtmlElement> headingLinks = Lists
-						.newArrayList(heading.getElementsByTagName("a"));
+				List<HtmlElement> headingLinks = new ArrayList<>(heading.getElementsByTagName("a"));
 				if (headingLinks.size() > 0)
 				{
 					for (HtmlElement headingLink : headingLinks)
