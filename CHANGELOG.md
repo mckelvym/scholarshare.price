@@ -1,5 +1,12 @@
 # Change Log
 
+## v1.2.0 (2023-03-28)
+
+- Migrate Java 8 -> Java 11
+- Add OpenRewrite 
+	- org.openrewrite.java.migrate.guava.NoGuava
+- Update Spring Boot version to 2.2.0
+
 ## v1.1.0 (2022-12-24)
 
 - Update Spring Boot version to 2.2.0

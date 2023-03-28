@@ -5,7 +5,7 @@
 
 	<groupId>mckelvym</groupId>
 	<artifactId>scholarshare.price</artifactId>
-	<version>1.1.0-SNAPSHOT</version>
+	<version>1.2.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>scholarshare.price</name>
@@ -21,7 +21,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
 	</properties>
 
@@ -85,6 +84,49 @@
 
 	<build>
 		<plugins>
+			<plugin> <!-- https://docs.openrewrite.org/reference/latest-versions-of-every-openrewrite-module -->
+			  <groupId>org.openrewrite.maven</groupId>
+			  <artifactId>rewrite-maven-plugin</artifactId>
+			  <version>4.42.0</version>
+			  <configuration>
+			    <activeRecipes>
+<!--					<recipe>org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_0</recipe>-->
+<!--					<recipe>org.openrewrite.java.spring.boot2.UpgradeSpringBoot_2_7</recipe>-->
+					<recipe>org.openrewrite.java.migrate.guava.NoGuava</recipe>
+<!--					<recipe>org.openrewrite.java.migrate.UpgradeToJava17</recipe>-->
+<!--					<recipe>org.openrewrite.java.migrate.JavaVersion17</recipe>-->
+<!--					<recipe>org.openrewrite.java.migrate.lombok.UpdateLombokToJava17</recipe>-->
+			    </activeRecipes>
+			  </configuration>			 
+			  <dependencies>
+		          <dependency>
+		            <groupId>org.openrewrite.recipe</groupId>
+		            <artifactId>rewrite-spring</artifactId>
+		            <version>4.34.0</version>
+		          </dependency>
+		          <dependency>
+		            <groupId>org.openrewrite.recipe</groupId>
+		            <artifactId>rewrite-migrate-java</artifactId>
+		            <version>1.18.0</version>
+		          </dependency>
+		          <dependency>
+		            <groupId>org.openrewrite.recipe</groupId>
+		            <artifactId>rewrite-logging-frameworks</artifactId>
+		            <version>1.19.0</version>
+		          </dependency>
+		          <dependency>
+		            <groupId>org.openrewrite.recipe</groupId>
+		            <artifactId>rewrite-java-security</artifactId>
+		            <version>1.23.0</version>
+		          </dependency>
+		      </dependencies>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<release>11</release>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
