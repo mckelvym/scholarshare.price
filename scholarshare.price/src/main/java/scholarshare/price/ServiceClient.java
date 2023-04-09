@@ -83,9 +83,9 @@ public class ServiceClient
 
 			for (Object match : matches)
 			{
-				if (match instanceof HtmlElement)
+				if (match instanceof HtmlElement element)
 				{
-					tables.add((HtmlElement) match);
+					tables.add(element);
 				}
 			}
 
@@ -248,17 +248,17 @@ public class ServiceClient
 		}
 		catch (final MalformedURLException e)
 		{
-			final String message = String.format("Unable to get daily entries");
+			final String message = "Unable to get daily entries".formatted();
 			throw new RestClientException(message, e);
 		}
 		catch (final IOException e)
 		{
-			final String message = String.format("Unable to get daily entries");
+			final String message = "Unable to get daily entries".formatted();
 			throw new RestClientException(message, e);
 		}
 		catch (final ParseException e)
 		{
-			final String message = String.format("Unable to get daily entries");
+			final String message = "Unable to get daily entries".formatted();
 			throw new RestClientException(message, e);
 		}
 		return Response.builder().build();
