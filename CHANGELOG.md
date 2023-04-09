@@ -1,5 +1,26 @@
 # Change Log
 
+## v1.3.0 (2023-04-09)
+
+- Migrate Java 11 -> Java 17
+- `.project` name change from `financial` to `scholarshare.price.project`
+- Coordinates change from `mckelvym:scholarshare.price` to `scholarshare:price`
+- Update Spring Boot version to 3.0.5
+- Update guava to 31.1-jre
+- Update org.eclipse.jdt:org.eclipse.jdt.annotation to 2.2.700
+- Add PicoCLI with options:
+	- --merge-file
+	- --out-file
+- Add OpenRewrite
+	- org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_0
+	- org.openrewrite.java.migrate.UpgradeToJava17
+	- org.openrewrite.java.migrate.JavaVersion17
+	- org.openrewrite.java.migrate.lombok.UpdateLombokToJava17
+	- org.openrewrite.java.logging.log4j.ParameterizedLogging
+	- org.openrewrite.java.migrate.lang.StringFormatted
+	- org.openrewrite.java.cleanup.FixStringFormatExpressions
+- Add Jib for container publish
+
 ## v1.2.0 (2023-03-28)
 
 - Migrate Java 8 -> Java 11
