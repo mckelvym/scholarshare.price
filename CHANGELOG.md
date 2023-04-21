@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.4.0 (2023-04-17)
+
+- Migrate to Gradle
+
 ## v1.3.0 (2023-04-09)
 
 - Migrate Java 11 -> Java 17
