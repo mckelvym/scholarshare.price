@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.5.0 (2023-11-03)
+
+- Restructure folder such that everything is in the root
+- Remove Maven & Eclipse files
+
 ## v1.4.0 (2023-04-17)
 
 - Migrate to Gradle
