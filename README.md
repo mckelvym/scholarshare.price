@@ -2,6 +2,8 @@
 
 Harvests price data from [https://www.scholarshare529.com/investment/price-performance](https://www.scholarshare529.com/investment/price-performance)
 
+Data pushed to [https://github.com/mckelvym/scholarshare_prices](https://github.com/mckelvym/scholarshare_prices)
+
 Notes: [https://mckelvym.gitlab.io/notes/scholarshare.price](https://mckelvym.gitlab.io/notes/scholarshare.price)
 
 ## Build
