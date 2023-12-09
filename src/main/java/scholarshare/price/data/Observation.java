@@ -1,4 +1,4 @@
-package scholarshare.price;
+package scholarshare.price.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.collect.ComparisonChain;

@@ -20,6 +20,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import scholarshare.price.data.Fund;
+import scholarshare.price.xfer.Request;
+import scholarshare.price.xfer.Response;
+import scholarshare.price.xfer.ServiceClient;
 
 /**
  * PicoCLI command

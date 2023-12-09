@@ -1,10 +1,11 @@
-package scholarshare.price;
+package scholarshare.price.xfer;
 
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.Iterator;
 import java.util.List;
+import scholarshare.price.data.Observation;
 
 /**
  * Collection of {@link Observation}

@@ -1,4 +1,4 @@
-package scholarshare.price;
+package scholarshare.price.xfer;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
@@ -19,6 +19,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import scholarshare.price.data.Fund;
+import scholarshare.price.data.Observation;
+import scholarshare.price.data.ScholarshareEntry;
 
 /**
  * Makes requests and parses them.

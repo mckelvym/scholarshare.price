@@ -1,5 +1,9 @@
 # Change Log
 
+## v1.6.0 (TBD)
+
+- Refactor most classes to `config`, `data`, or `xfer` packages.
+
 ## v1.5.0 (2023-11-03)
 
 - Restructure folder such that everything is in the root

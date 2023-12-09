@@ -1,4 +1,4 @@
-package scholarshare.price;
+package scholarshare.price.xfer;
 
 import com.google.common.collect.Maps;
 import lombok.Data;
@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
+import scholarshare.price.config.Properties;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

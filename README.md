@@ -37,11 +37,25 @@ To see available recipes:
 
 ## Run
 
+In Gradle:
+
+```bash
+./gradlew run
+```
+
+In Docker:
+
 ```bash
 docker run -it registry.hub.docker.com/mckelvym/scholarshare.price:1.4.0
 ```
 
 See available options with:
+
+```bash
+./gradlew run --args="--help"
+```
+
+Or:
 
 ```bash
 docker run -it registry.hub.docker.com/mckelvym/scholarshare.price:1.4.0 --help

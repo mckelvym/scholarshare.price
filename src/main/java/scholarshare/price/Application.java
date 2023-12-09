@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
+import scholarshare.price.xfer.Request;
 
 /**
  * Downloads share price information from scholarshare site.

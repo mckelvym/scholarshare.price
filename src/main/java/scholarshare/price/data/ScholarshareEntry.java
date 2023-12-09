@@ -1,4 +1,4 @@
-package scholarshare.price;
+package scholarshare.price.data;
 
 import com.google.common.base.CharMatcher;
 import lombok.Builder;

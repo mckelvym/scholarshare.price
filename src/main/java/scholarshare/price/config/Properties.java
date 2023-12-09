@@ -1,4 +1,4 @@
-package scholarshare.price;
+package scholarshare.price.config;
 
 import lombok.Data;
 import lombok.Getter;
