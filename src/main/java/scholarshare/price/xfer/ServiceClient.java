@@ -1,24 +1,28 @@
 package scholarshare.price.xfer;
 
+import static java.util.Collections.singletonList;
+
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.util.DefaultUriBuilderFactory;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 import scholarshare.price.data.Fund;
 import scholarshare.price.data.Observation;
 import scholarshare.price.data.ScholarshareEntry;
@@ -216,7 +220,7 @@ public class ServiceClient {
                 final Observation observation = Observation.builder().date(date)
                         .value(values).build();
                 return Response.builder()
-                        .observations(Collections.singletonList(observation)).build();
+                        .observations(singletonList(observation)).build();
             }
         } catch (final MalformedURLException e) {
             final String message = "Unable to get daily entries";

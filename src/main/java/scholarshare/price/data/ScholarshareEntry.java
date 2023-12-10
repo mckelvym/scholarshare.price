@@ -1,13 +1,12 @@
 package scholarshare.price.data;
 
 import com.google.common.base.CharMatcher;
+import java.time.LocalDate;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-
-import java.time.LocalDate;
-import java.util.Optional;
 
 /**
  * A single entry

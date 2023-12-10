@@ -1,7 +1,6 @@
 package scholarshare.price;
 
-import com.google.common.base.Joiner;
-import com.google.common.io.Files;
+import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,18 +8,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
-import scholarshare.price.data.Fund;
+import scholarshare.price.config.OutputConfig;
+import scholarshare.price.output.CsvWriter;
+import scholarshare.price.output.StdOutWriter;
 import scholarshare.price.xfer.Request;
 import scholarshare.price.xfer.Response;
 import scholarshare.price.xfer.ServiceClient;
@@ -103,66 +93,8 @@ public class ApplicationCommand implements Callable<Integer> {
         @SuppressWarnings("null") final Response response = context.getBean(ServiceClient.class)
                 .get(context.getBean(Request.class));
 
-        response.getObservations().forEach(o ->
-        {
-            final List<String> elements = new ArrayList<>();
-            final String date = String.valueOf(o.getDate());
-            elements.add(date);
-            final List<Fund> ordered = new ArrayList<>(Fund.getOrdered());
-            Collections.reverse(ordered);
-            ordered.stream().map(o.getValue()::get)
-                    .map(v -> String.format("%.2f", v)).forEach(elements::add);
-
-            System.out.println(
-                    "Date," + ordered.stream().map(Fund::getDescription)
-                            .collect(Collectors.joining(",")));
-            System.out.println(Joiner.on(",").join(elements));
-
-            if (outFile != null) {
-                log.info("Write to " + outFile);
-                try (BufferedWriter writer = Files.newWriter(new File(outFile),
-                        Charset.defaultCharset())) {
-                    writer.write(
-                            "Date," + ordered.stream().map(Fund::getDescription)
-                                    .collect(Collectors.joining(",")));
-                    writer.newLine();
-                    writer.write(Joiner.on(",").join(elements));
-                    writer.newLine();
-
-                    if (mergeFile != null && new File(mergeFile).exists()) {
-                        log.info("Read from: " + mergeFile);
-                        Files.readLines(new File(mergeFile),
-                                        Charset.defaultCharset()).stream().skip(1)
-                                .forEach(line ->
-                                {
-                                    if (line.startsWith(date)) {
-                                        return;
-                                    }
-                                    try {
-                                        writer.write(line);
-                                        writer.newLine();
-                                    } catch (final FileNotFoundException e) {
-                                        final String message = "Unable to locate file: %s"
-                                                .formatted(mergeFile);
-                                        log.error(message, e);
-                                    } catch (final IOException e) {
-                                        final String message = "Unable to read: %s"
-                                                .formatted(mergeFile);
-                                        log.error(message, e);
-                                    }
-                                });
-                    }
-                } catch (final FileNotFoundException e) {
-                    final String message = "Unable to locate file: %s"
-                            .formatted(outFile);
-                    log.error(message, e);
-                } catch (final IOException e) {
-                    final String message = "Unable to write to: %s"
-                            .formatted(outFile);
-                    log.error(message, e);
-                }
-            }
-        });
+        new StdOutWriter().writeResponse(response);
+        new CsvWriter(new OutputConfig(mergeFile, outFile)).writeResponse(response);
 
         return 0;
     }
