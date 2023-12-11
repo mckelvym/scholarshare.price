@@ -1,8 +1,6 @@
 package scholarshare.price.data;
 
-import com.google.common.base.CharMatcher;
 import java.time.LocalDate;
-import java.util.Optional;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -53,22 +51,4 @@ public class ScholarshareEntry {
      */
     @NonNull
     private Number value;
-
-    /**
-     * @return the {@link Fund} if it could be matched, otherwise
-     * {@link Fund#NOOP}
-     * @since Nov 24, 2017
-     */
-    public Fund getFundFromName() {
-        String entryName = CharMatcher.whitespace()
-                .replaceFrom(String.format("%s", getName()), ' ');
-
-        entryName = CharMatcher.javaLetterOrDigit().or(CharMatcher.is('_'))
-                .retainFrom(CharMatcher.whitespace().or(CharMatcher.is('-'))
-                        .replaceFrom(entryName, "_"))
-                .toUpperCase();
-
-        final Optional<Fund> tryValueOf = Fund.tryValueOf(entryName);
-        return tryValueOf.orElse(Fund.NOOP);
-    }
 }

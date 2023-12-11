@@ -24,7 +24,6 @@ public class Observation implements Comparable<Observation> {
     /**
      * The observation timestamp.
      *
-     * @author mckelvym
      * @since Nov 23, 2017
      */
     private final LocalDate date;
@@ -40,4 +39,8 @@ public class Observation implements Comparable<Observation> {
                 .result();
     }
 
+    public String getFormattedValue(Fund fund) {
+        final Number v = value.get(fund);
+        return v != null ? String.format("%.2f", v.doubleValue()) : "-";
+    }
 }

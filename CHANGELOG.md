@@ -1,8 +1,9 @@
 # Change Log
 
-## v1.6.0 (TBD)
+## v1.6.0 (2023-12-10)
 
-- Refactor most classes to `config`, `data`, or `xfer` packages.
+- Support for RSS export
+- Refactor classes separate packages
 
 ## v1.5.0 (2023-11-03)
 

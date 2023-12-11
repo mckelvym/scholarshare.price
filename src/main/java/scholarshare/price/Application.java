@@ -19,7 +19,6 @@ public class Application {
      * @param args
      * @since Nov 23, 2017
      */
-    @SuppressWarnings("resource")
     public static void main(final String[] args) {
         System.setProperty("spring.main.allow-bean-definition-overriding",
                 "true");

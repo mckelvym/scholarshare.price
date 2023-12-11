@@ -2,15 +2,14 @@ package scholarshare.price.output;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-import com.google.common.io.LineProcessor;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -18,9 +17,8 @@ import org.slf4j.LoggerFactory;
 import scholarshare.price.config.OutputConfig;
 import scholarshare.price.data.Fund;
 import scholarshare.price.data.Observation;
-import scholarshare.price.xfer.Response;
 
-public class CsvWriter {
+public class CsvWriter implements ObservationWriter {
 
     private static final Logger log = LoggerFactory
             .getLogger(CsvWriter.class);
@@ -37,11 +35,12 @@ public class CsvWriter {
         Collections.reverse(funds);
     }
 
-    public void writeResponse(Response response) {
-        requireNonNull(response);
+    @Override
+    public void writeObservations(List<Observation> observations) {
+        requireNonNull(observations);
 
         final Optional<File> outFileOpt = outputConfig.outFile();
-        if (!outFileOpt.isPresent()) {
+        if (outFileOpt.isEmpty()) {
             return;
         }
         log.info("Write to " + outFileOpt.get());
@@ -49,9 +48,9 @@ public class CsvWriter {
                 Charset.defaultCharset())) {
             this.writer = writer;
             printHeader();
-            response.getObservations().forEach(this::printObservation);
+            observations.forEach(this::printObservation);
 
-            processMergeFile(response, outputConfig);
+            processMergeObservations(observations, outputConfig);
 
         } catch (final FileNotFoundException e) {
             final String message = "Unable to locate file: %s"
@@ -64,40 +63,13 @@ public class CsvWriter {
         }
     }
 
-    private void processMergeFile(Response response, OutputConfig outputConfig) throws IOException {
-        Set<String> dates = response.getObservations().stream()
+    private void processMergeObservations(List<Observation> observations, OutputConfig outputConfig) throws IOException {
+        Set<LocalDate> dates = observations.stream()
                 .map(Observation::getDate)
-                .map(String::valueOf)
                 .collect(Collectors.toSet());
-        final Optional<File> mergeFileOpt = outputConfig.mergeFile();
-        if (mergeFileOpt.isPresent() && mergeFileOpt.get().exists()) {
-            log.info("Read from: " + mergeFileOpt);
-            final List<List<String>> lines = Files.asCharSource(mergeFileOpt.get(),
-                    Charset.defaultCharset()).readLines(lineProcessor(dates));
-            lines.stream().skip(1).forEach(this::printRow);
-        }
-    }
-
-    private LineProcessor<List<List<String>>> lineProcessor(Set<String> excludeDates) {
-        return new LineProcessor<>() {
-            private final List<List<String>> results = Lists.newArrayList();
-            private final Splitter splitter = Splitter.on(",");
-
-            @Override
-            public boolean processLine(String line) {
-                final List<String> elements = splitter.splitToList(line);
-                final boolean isValid = elements.size() > 0 && !excludeDates.contains(elements.get(0));
-                if (isValid) {
-                    results.add(elements);
-                }
-                return true;
-            }
-
-            @Override
-            public List<List<String>> getResult() {
-                return results;
-            }
-        };
+        outputConfig.mergeObservations().stream()
+                .filter(o -> !dates.contains(o.getDate()))
+                .forEach(this::printObservation);
     }
 
     private void printHeader() throws IOException {
@@ -109,15 +81,14 @@ public class CsvWriter {
     private void printObservation(Observation o) {
         final List<String> elements = Lists.newArrayList(String.valueOf(o.getDate()));
         funds.stream()
-                .map(o.getValue()::get)
-                .map(v -> String.format("%.2f", v))
+                .map(o::getFormattedValue)
                 .forEach(elements::add);
         printRow(elements);
     }
 
     private void printRow(List<String> elements) {
         try {
-            writer.write(elements.stream().collect(Collectors.joining(",")));
+            writer.write(String.join(",", elements));
             writer.newLine();
         } catch (IOException e) {
             throw new RuntimeException(e);

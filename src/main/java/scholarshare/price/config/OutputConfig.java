@@ -5,21 +5,18 @@ import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
+import scholarshare.price.data.Observation;
 
-public record OutputConfig(Optional<String> mergeFilePath, Optional<String> outFilePath) {
-    public OutputConfig(Optional<String> mergeFilePath, Optional<String> outFilePath) {
-        final Optional<String> empty = empty();
-        this.mergeFilePath = firstNonNull(mergeFilePath, empty);
-        this.outFilePath = firstNonNull(outFilePath, empty);
+public record OutputConfig(List<Observation> mergeObservations, Optional<String> outFilePath) {
+    public OutputConfig(List<Observation> mergeObservations, Optional<String> outFilePath) {
+        this.mergeObservations = firstNonNull(mergeObservations, List.of());
+        this.outFilePath = firstNonNull(outFilePath, empty());
     }
 
-    public OutputConfig(String mergeFilePath, String outFilePath) {
-        this(ofNullable(mergeFilePath), ofNullable(outFilePath));
-    }
-
-    public Optional<File> mergeFile() {
-        return mergeFilePath().map(File::new);
+    public OutputConfig(List<Observation> mergeObservations, String outFilePath) {
+        this(mergeObservations, ofNullable(outFilePath));
     }
 
     public Optional<File> outFile() {

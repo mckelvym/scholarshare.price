@@ -18,7 +18,6 @@ public class Response implements Iterable<Observation> {
     /**
      * The collection of {@link Observation}
      *
-     * @author mckelvym
      * @since Nov 23, 2017
      */
     private final List<Observation> observations;

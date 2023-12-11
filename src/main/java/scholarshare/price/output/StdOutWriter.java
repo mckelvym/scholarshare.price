@@ -7,12 +7,10 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import scholarshare.price.data.Fund;
 import scholarshare.price.data.Observation;
-import scholarshare.price.xfer.Response;
 
-public class StdOutWriter {
+public class StdOutWriter implements ObservationWriter {
 
     private final List<Fund> funds;
 
@@ -23,13 +21,14 @@ public class StdOutWriter {
         Collections.reverse(funds);
     }
 
-    public void writeResponse(Response response) {
-        requireNonNull(response);
+    @Override
+    public void writeObservations(List<Observation> observations) {
+        requireNonNull(observations);
 
         out = System.out;
 
         printHeader();
-        response.getObservations().forEach(this::printObservation);
+        observations.forEach(this::printObservation);
     }
 
     private void printHeader() {
@@ -41,13 +40,12 @@ public class StdOutWriter {
     private void printObservation(Observation o) {
         final List<String> elements = Lists.newArrayList(String.valueOf(o.getDate()));
         funds.stream()
-                .map(o.getValue()::get)
-                .map(v -> String.format("%.2f", v))
+                .map(o::getFormattedValue)
                 .forEach(elements::add);
         printRow(elements);
     }
 
     private void printRow(List<String> elements) {
-        out.println(elements.stream().collect(Collectors.joining(",")));
+        out.println(String.join(",", elements));
     }
 }

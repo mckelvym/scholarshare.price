@@ -152,7 +152,6 @@ public class ServiceClient {
                         Optional<Fund> tryValueOf = Fund.tryValueOf(headingS);
                         if (tryValueOf.isPresent()
                                 && tryValueOf.get() != Fund.NOOP) {
-                            final String nameS = headingS;
                             final String valueS = dataElements.remove(0)
                                     .getTextContent().split("\\$")[1];
                             final String changeS = dataElements.remove(0)
@@ -175,13 +174,13 @@ public class ServiceClient {
                                     .parseDouble(changePcS_Cleaned);
 
                             final ScholarshareEntry entry = ScholarshareEntry
-                                    .builder().name(nameS).value(value)
+                                    .builder().name(headingS).value(value)
                                     .change(change).changePercent(changePc)
                                     .date(dateRef.get()).fund(tryValueOf.get())
                                     .build();
                             log.info(String.format(
                                     "Build entry from name=%s value=%s change=%s changePercent=%s date=%s; fund=%s",
-                                    nameS, value, change, changePc,
+                                    headingS, value, change, changePc,
                                     dateRef.get(), entry.getFund()));
                             entries.add(entry);
                             break;
@@ -222,13 +221,7 @@ public class ServiceClient {
                 return Response.builder()
                         .observations(singletonList(observation)).build();
             }
-        } catch (final MalformedURLException e) {
-            final String message = "Unable to get daily entries";
-            throw new RestClientException(message, e);
-        } catch (final IOException e) {
-            final String message = "Unable to get daily entries";
-            throw new RestClientException(message, e);
-        } catch (final ParseException e) {
+        } catch (final ParseException | IOException e) {
             final String message = "Unable to get daily entries";
             throw new RestClientException(message, e);
         }

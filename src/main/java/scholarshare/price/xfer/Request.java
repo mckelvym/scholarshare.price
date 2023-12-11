@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import scholarshare.price.config.Properties;
 
 /**
- * Used to make arequest. Loads default values from beans by scanning
+ * Used to make a request. Loads default values from beans by scanning
  * parameters.
  *
  * @author mckelvym
@@ -25,7 +25,6 @@ import scholarshare.price.config.Properties;
 @EqualsAndHashCode
 public class Request {
     /**
-     * @author mckelvym
      * @since Nov 23, 2017
      */
     @Autowired
@@ -48,8 +47,7 @@ public class Request {
      */
     public String toUriTemplate() {
         checkValid();
-        final String serviceUrl = properties.getServiceUrl();
-        return serviceUrl;
+        return properties.getServiceUrl();
     }
 
     /**
@@ -60,7 +58,6 @@ public class Request {
      */
     public Map<String, Object> toUriVariables() {
         checkValid();
-        final Map<String, Object> map = Maps.newHashMap();
-        return map;
+        return Maps.newHashMap();
     }
 }
