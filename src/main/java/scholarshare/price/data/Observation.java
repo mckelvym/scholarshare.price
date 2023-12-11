@@ -41,6 +41,6 @@ public class Observation implements Comparable<Observation> {
 
     public String getFormattedValue(Fund fund) {
         final Number v = value.get(fund);
-        return v != null ? String.format("%.2f", v.doubleValue()) : "-";
+        return v != null ? "%.2f".formatted(v.doubleValue()) : "-";
     }
 }

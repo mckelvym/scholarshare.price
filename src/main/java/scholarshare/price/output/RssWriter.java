@@ -2,7 +2,6 @@ package scholarshare.price.output;
 
 import static java.util.Objects.requireNonNull;
 
-import com.google.common.collect.Lists;
 import com.rometools.rome.feed.synd.*;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedOutput;
@@ -57,7 +56,7 @@ public class RssWriter implements ObservationWriter {
         }
         log.info("Write to " + outFileOpt.get());
 
-        List<SyndEntry> rssEntries = Lists.newArrayList();
+        List<SyndEntry> rssEntries = new ArrayList<>();
         observations.stream().map(this::toSyndEntry).forEach(rssEntries::add);
         rssEntries.addAll(processMergeFile(observations, outputConfig));
         feed.setEntries(rssEntries);

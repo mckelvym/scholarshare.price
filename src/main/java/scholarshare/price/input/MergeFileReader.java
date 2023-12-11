@@ -4,7 +4,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Files;
 import java.io.File;
@@ -46,7 +45,7 @@ public class MergeFileReader {
         log.info("Read from: " + mergeFile);
         try {
             final List<String> lines = Files.readLines(mergeFile, Charset.defaultCharset());
-            List<Observation> observations = Lists.newArrayListWithCapacity(lines.size() - 1);
+            List<Observation> observations = new ArrayList<>(lines.size() - 1);
             boolean headerSkipped = false;
             for (String line : lines) {
                 if (!headerSkipped) {
