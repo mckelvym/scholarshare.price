@@ -1,24 +1,31 @@
-package scholarshare.price;
+package scholarshare.price.xfer;
+
+import static java.util.Collections.singletonList;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.google.common.base.CharMatcher;
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.util.DefaultUriBuilderFactory;
-
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+import scholarshare.price.data.Fund;
+import scholarshare.price.data.Observation;
+import scholarshare.price.data.ScholarshareEntry;
 
 /**
  * Makes requests and parses them.
@@ -145,7 +152,6 @@ public class ServiceClient {
                         Optional<Fund> tryValueOf = Fund.tryValueOf(headingS);
                         if (tryValueOf.isPresent()
                                 && tryValueOf.get() != Fund.NOOP) {
-                            final String nameS = headingS;
                             final String valueS = dataElements.remove(0)
                                     .getTextContent().split("\\$")[1];
                             final String changeS = dataElements.remove(0)
@@ -168,13 +174,13 @@ public class ServiceClient {
                                     .parseDouble(changePcS_Cleaned);
 
                             final ScholarshareEntry entry = ScholarshareEntry
-                                    .builder().name(nameS).value(value)
+                                    .builder().name(headingS).value(value)
                                     .change(change).changePercent(changePc)
                                     .date(dateRef.get()).fund(tryValueOf.get())
                                     .build();
                             log.info(String.format(
                                     "Build entry from name=%s value=%s change=%s changePercent=%s date=%s; fund=%s",
-                                    nameS, value, change, changePc,
+                                    headingS, value, change, changePc,
                                     dateRef.get(), entry.getFund()));
                             entries.add(entry);
                             break;
@@ -213,15 +219,9 @@ public class ServiceClient {
                 final Observation observation = Observation.builder().date(date)
                         .value(values).build();
                 return Response.builder()
-                        .observations(Collections.singletonList(observation)).build();
+                        .observations(singletonList(observation)).build();
             }
-        } catch (final MalformedURLException e) {
-            final String message = "Unable to get daily entries";
-            throw new RestClientException(message, e);
-        } catch (final IOException e) {
-            final String message = "Unable to get daily entries";
-            throw new RestClientException(message, e);
-        } catch (final ParseException e) {
+        } catch (final ParseException | IOException e) {
             final String message = "Unable to get daily entries";
             throw new RestClientException(message, e);
         }

@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
+import scholarshare.price.xfer.Request;
 
 /**
  * Downloads share price information from scholarshare site.
@@ -18,7 +19,6 @@ public class Application {
      * @param args
      * @since Nov 23, 2017
      */
-    @SuppressWarnings("resource")
     public static void main(final String[] args) {
         System.setProperty("spring.main.allow-bean-definition-overriding",
                 "true");

@@ -1,4 +1,4 @@
-package scholarshare.price;
+package scholarshare.price.config;
 
 import lombok.Data;
 import lombok.Getter;
@@ -26,4 +26,14 @@ public class Properties {
      * @since Nov 23, 2017
      */
     private String serviceUrl;
+
+    /**
+     * @since Dec 10, 2023
+     */
+    private String repoUrl;
+
+    /**
+     * @since Dec 10, 2023
+     */
+    private String csvUrl;
 }

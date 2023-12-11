@@ -1,5 +1,10 @@
 # Change Log
 
+## v1.6.0 (2023-12-10)
+
+- Support for RSS export
+- Refactor classes separate packages
+
 ## v1.5.0 (2023-11-03)
 
 - Restructure folder such that everything is in the root

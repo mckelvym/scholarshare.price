@@ -1,7 +1,7 @@
 package scholarshare.price;
 
-import com.google.common.base.Joiner;
-import com.google.common.io.Files;
+import java.util.List;
+import java.util.concurrent.Callable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,17 +9,16 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
+import scholarshare.price.config.OutputConfig;
+import scholarshare.price.config.Properties;
+import scholarshare.price.data.Observation;
+import scholarshare.price.input.MergeFileReader;
+import scholarshare.price.output.CsvWriter;
+import scholarshare.price.output.RssWriter;
+import scholarshare.price.output.StdOutWriter;
+import scholarshare.price.xfer.Request;
+import scholarshare.price.xfer.Response;
+import scholarshare.price.xfer.ServiceClient;
 
 /**
  * PicoCLI command
@@ -34,16 +33,17 @@ public class ApplicationCommand implements Callable<Integer> {
     /**
      * Class logger
      *
-     * @author mckelvym
      * @since Mar 30, 2023
      */
     private static final Logger log = LoggerFactory
             .getLogger(ApplicationCommand.class);
+
     /**
      * @since Nov 23, 2017
      */
     @Autowired
     private ConfigurableApplicationContext context;
+
     /**
      * @since Mar 8, 2020
      */
@@ -52,6 +52,7 @@ public class ApplicationCommand implements Callable<Integer> {
             description = "Merge with past entries in this file.",
             paramLabel = "merge-file.csv")
     private String mergeFile;
+
     /**
      * @since Mar 8, 2020
      */
@@ -62,14 +63,21 @@ public class ApplicationCommand implements Callable<Integer> {
     private String outFile;
 
     /**
+     * @since Dec 10, 2023
+     */
+    @Option(
+            names = {"-r", "--out-rss-file"},
+            description = "Output RSS to this file, possibly with merges included (if specified)",
+            paramLabel = "feed.xml")
+    private String outRssFile;
+
+    /**
      * Suppress normal logging from httpclient and http headers traffic.
      *
      * @since Feb 16, 2016
      */
     private static void disableNoisyLogging() {
-        /**
-         * HTTP traffic log will be really noisy without this...
-         */
+        // HTTP traffic log will be really noisy without this...
         java.util.logging.Logger.getLogger("org.apache.http.wire")
                 .setLevel(java.util.logging.Level.FINEST);
         java.util.logging.Logger.getLogger("org.apache.http.headers")
@@ -93,72 +101,20 @@ public class ApplicationCommand implements Callable<Integer> {
     public Integer call() {
         log.info("merge-file=" + mergeFile);
         log.info("out-file=" + outFile);
+        log.info("out-rss-file=" + outRssFile);
 
         disableNoisyLogging();
 
-        @SuppressWarnings("null") final Response response = context.getBean(ServiceClient.class)
-                .get(context.getBean(Request.class));
+        final Request request = context.getBean(Request.class);
+        final ServiceClient serviceClient = context.getBean(ServiceClient.class);
+        Response response = serviceClient.get(request);
+        final Properties properties = context.getBean(Properties.class);
 
-        response.getObservations().forEach(o ->
-        {
-            final List<String> elements = new ArrayList<>();
-            final String date = String.valueOf(o.getDate());
-            elements.add(date);
-            final List<Fund> ordered = new ArrayList<>(Fund.getOrdered());
-            Collections.reverse(ordered);
-            ordered.stream().map(o.getValue()::get)
-                    .map(v -> String.format("%.2f", v)).forEach(elements::add);
-
-            System.out.println(
-                    "Date," + ordered.stream().map(Fund::getDescription)
-                            .collect(Collectors.joining(",")));
-            System.out.println(Joiner.on(",").join(elements));
-
-            if (outFile != null) {
-                log.info("Write to " + outFile);
-                try (BufferedWriter writer = Files.newWriter(new File(outFile),
-                        Charset.defaultCharset())) {
-                    writer.write(
-                            "Date," + ordered.stream().map(Fund::getDescription)
-                                    .collect(Collectors.joining(",")));
-                    writer.newLine();
-                    writer.write(Joiner.on(",").join(elements));
-                    writer.newLine();
-
-                    if (mergeFile != null && new File(mergeFile).exists()) {
-                        log.info("Read from: " + mergeFile);
-                        Files.readLines(new File(mergeFile),
-                                        Charset.defaultCharset()).stream().skip(1)
-                                .forEach(line ->
-                                {
-                                    if (line.startsWith(date)) {
-                                        return;
-                                    }
-                                    try {
-                                        writer.write(line);
-                                        writer.newLine();
-                                    } catch (final FileNotFoundException e) {
-                                        final String message = "Unable to locate file: %s"
-                                                .formatted(mergeFile);
-                                        log.error(message, e);
-                                    } catch (final IOException e) {
-                                        final String message = "Unable to read: %s"
-                                                .formatted(mergeFile);
-                                        log.error(message, e);
-                                    }
-                                });
-                    }
-                } catch (final FileNotFoundException e) {
-                    final String message = "Unable to locate file: %s"
-                            .formatted(outFile);
-                    log.error(message, e);
-                } catch (final IOException e) {
-                    final String message = "Unable to write to: %s"
-                            .formatted(outFile);
-                    log.error(message, e);
-                }
-            }
-        });
+        List<Observation> mergeObservations = mergeFile != null ? new MergeFileReader().parse(mergeFile) : List.of();
+        List<Observation> observations = response.getObservations();
+        new CsvWriter(new OutputConfig(mergeObservations, outFile)).writeObservations(observations);
+        new RssWriter(new OutputConfig(mergeObservations, outRssFile), properties).writeObservations(observations);
+        new StdOutWriter().writeObservations(observations);
 
         return 0;
     }
