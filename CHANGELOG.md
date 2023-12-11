@@ -1,5 +1,11 @@
 # Change Log
 
+## TBD
+
+- io.freefair.lombok version '8.4'
+- com.google.cloud.tools.jib version '3.4.0'
+- org.openrewrite.rewrite '5.40.6'
+
 ## v1.6.0 (2023-12-10)
 
 - Support for RSS export

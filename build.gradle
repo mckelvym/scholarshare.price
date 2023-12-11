@@ -9,9 +9,9 @@ plugins {
     id 'application'
     id 'java-library'
     id 'maven-publish'
-    id("io.freefair.lombok") version "8.0.1"
-    id 'com.google.cloud.tools.jib' version '3.3.1'
-    id 'org.openrewrite.rewrite' version '5.39.0'
+    id("io.freefair.lombok") version "8.4"
+    id 'com.google.cloud.tools.jib' version '3.4.0'
+    id 'org.openrewrite.rewrite' version '5.40.6'
 }
 
 application {
